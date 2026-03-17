@@ -36,7 +36,7 @@ def render(dp):
 
     # 1. 데이터 불러오기 (기존 CSV 로직 유지)
     # 실제 프로젝트 환경에 맞춰 경로를 체크하세요.
-    file_path = r"data/processed/지역별_등록차량대비_교통량비율(2시간).csv"
+    file_path = r"C:\Users\test\OneDrive\Desktop\SKN28-first-1TEAM\data\processed\지역별_등록차량대비_교통량비율(2시간).csv"
     
     if not os.path.exists(file_path):
         st.error(f"파일을 찾을 수 없습니다: {file_path}")
@@ -46,7 +46,7 @@ def render(dp):
     df.columns = df.columns.str.strip()
 
     # 2. GeoJSON 불러오기 (서울 구 경계 - 로컬 파일 권장)
-    with open("app/seoul_geo_gu.json", encoding='utf-8') as f:
+    with open("seoul_geo_gu.json", encoding='utf-8') as f:
         seoul_geo = json.load(f)
 
     # 3. 자치구 좌표 데이터 (텍스트 표시용)

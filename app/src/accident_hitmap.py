@@ -8,7 +8,7 @@ def render(dp):
     st.title("시간대별 교통 사고량/교통량 히트맵")
 
     # 1. 지도 데이터 로드
-    with open("app/seoul_geo_gu.json", encoding='utf-8') as f:
+    with open("seoul_geo_gu.json", encoding='utf-8') as f:
         seoul_geo = json.load(f)
 
     # 2. 자치구 좌표 데이터
