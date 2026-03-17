@@ -136,15 +136,19 @@ class DataProvider:
         """
         return self.get_query_data(query)
     
-    def get_correlation_data(self):
-    # 시간대별 교통량 합계와 사고수 합계를 가져오는 쿼리
+    def get_congestion_map_data(self):
+        """
+        DB 데이터를 JOIN 하여 실시간 교통 포화도(비율)를 계산합니다.
+        (교통량 / 등록차량수) * 100 산식을 사용합니다.
+        """
         query = """
         SELECT 
-            t.time_slot, 
-            SUM(t.volume) as total_traffic, 
-            SUM(a.volume) as total_accidents
+            l.local_name AS gu,
+            t.time_slot,
+            -- (교통량 / 등록대수) * 100을 통해 포화도(congestion_rate) 산출
+            (CAST(t.volume AS FLOAT) / r.car_count) * 100 AS congestion_rate
         FROM car_traffic_by_time t
-        JOIN car_accident_by_time a ON t.time_slot = a.time_slot AND t.local_code_traffic = a.local_code_accident
-        GROUP BY t.time_slot
+        JOIN car_reg r ON t.local_code_traffic = r.local_code_reg
+        JOIN locals l ON t.local_code_traffic = l.local_codes
         """
         return self.get_query_data(query)
