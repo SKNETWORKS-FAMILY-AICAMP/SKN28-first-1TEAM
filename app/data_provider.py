@@ -104,3 +104,34 @@ class DataProvider:
         """
         gu_df = self.get_query_data(gu_query)
         return total_avg, gu_df
+    
+    def get_driving_score(self, gu_name, time_slot):
+        """특정 구와 시간대의 데이터를 분석하여 운전 점수 산출"""
+        
+        # 1. '06~08' 형식을 '6시~8시' 형식으로 변환 (앞의 0 제거 및 '시' 추가)
+        start_t, end_t = time_slot.split('~')
+        db_time_slot = f"{int(start_t)}시~{int(end_t)}시"
+
+        # 2. 서브쿼리를 이용해 각각의 테이블에서 데이터를 안전하게 가져옴
+        query = f"""
+        SELECT 
+            l.local_name as gu,
+            -- 사고 건수
+            (SELECT IFNULL(SUM(volume), 0) 
+             FROM car_accident_by_time 
+             WHERE local_code_accident = l.local_codes 
+               AND time_slot = '{db_time_slot}') as accidents,
+            -- 통행량
+            (SELECT IFNULL(SUM(volume), 0) 
+             FROM car_traffic_by_time 
+             WHERE local_code_traffic = l.local_codes 
+               AND time_slot = '{db_time_slot}') as traffic,
+            -- 혼잡도
+            IFNULL(cong.congestion_frequency, 0) as congestion_frequency,
+            IFNULL(cong.congestion_time, 0) as congestion_time
+        FROM locals l
+        LEFT JOIN congestion cong ON l.local_codes = cong.local_code_congestion
+        WHERE l.local_name = '{gu_name}'
+        LIMIT 1
+        """
+        return self.get_query_data(query)
