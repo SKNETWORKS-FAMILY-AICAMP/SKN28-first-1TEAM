@@ -3,7 +3,7 @@ import json
 import os
 from data_provider import DataProvider
 # 분리된 페이지들을 임포트
-from src import summary, accident_hitmap, traffic, risk, faq, advisor, traffic_vol
+from src import summary, accident_hitmap, traffic, risk, faq, advisor, test
 
 st.set_page_config(page_title="2023 서울 교통 대시보드", layout="wide")
 dp = DataProvider()
@@ -34,7 +34,7 @@ elif menu == "사고 지도 히트맵":
 elif menu == "운전 가이드":
     advisor.render(dp)
 elif menu == "test":
-    traffic_vol.render(dp)
+    test.render(dp)
 elif menu == "FAQ":
     faq.render()
     
