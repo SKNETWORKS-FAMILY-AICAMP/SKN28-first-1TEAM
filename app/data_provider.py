@@ -135,3 +135,16 @@ class DataProvider:
         LIMIT 1
         """
         return self.get_query_data(query)
+    
+    def get_correlation_data(self):
+    # 시간대별 교통량 합계와 사고수 합계를 가져오는 쿼리
+        query = """
+        SELECT 
+            t.time_slot, 
+            SUM(t.volume) as total_traffic, 
+            SUM(a.volume) as total_accidents
+        FROM car_traffic_by_time t
+        JOIN car_accident_by_time a ON t.time_slot = a.time_slot AND t.local_code_traffic = a.local_code_accident
+        GROUP BY t.time_slot
+        """
+        return self.get_query_data(query)
