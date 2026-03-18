@@ -1,5 +1,7 @@
 import streamlit as st
 import plotly.express as px
+px.defaults.color_discrete_sequence = px.colors.qualitative.Alphabet
+
 
 def render(dp):
     st.title("인구&차량 대비 교통 혼잡도 / 사고 위험지수 분석")
