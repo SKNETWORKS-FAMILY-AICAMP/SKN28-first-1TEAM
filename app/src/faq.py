@@ -2,6 +2,10 @@ import streamlit as st
 
 def render():
     st.title("FAQ")
+    with st.expander("왜 2023년도 데이터를 사용했나요?"):
+        st.write("""
+                본 프로젝트에서는 교통량과 사고수 데이터가 **가장 최신이면서도 안정적으로 확보 가능한 연도인 2023년 데이터**를 사용했습니다.
+                 """)
     with st.expander("이 프로젝트는 어떤 문제를 해결하나요?"):
         st.write("""
                  서울시 자치구별 차량 등록 수, 교통량, 교통사고 데이터를 통합하여  
