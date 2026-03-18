@@ -39,7 +39,7 @@ def render(dp):
             traffic_score = min(100, max(0, traffic_score))
             
             # 3. 최종 통합 위험 점수 (가중치 밸런스)
-            final_score = int((acc_score * 0.4) + (freq * 0.3) + (traffic_score * 0.3))
+            final_score = int((acc_score * 0.5) + (traffic_score * 0.5))
 
             # --- [결과 출력] ---
             st.divider()
@@ -53,20 +53,6 @@ def render(dp):
             else:
                 st.success(f"### 최종 위험 지수: {final_score}점 - 🟢 양호")
                 st.markdown(f"**{selected_gu}**의 **{selected_time_display}**는 전반적으로 쾌적하고 안전한 주행이 가능합니다.")
-
-            # 시각화: 레이더 차트
-            fig = go.Figure()
-            fig.add_trace(go.Scatterpolar(
-                r=[acc_score, freq, traffic_score],
-                theta=['사고 지수', '혼잡 빈도', '교통 밀집도'],
-                fill='toself',
-                line=dict(color='#FF4B4B')
-            ))
-            fig.update_layout(
-                polar=dict(radialaxis=dict(visible=True, range=[0, 100])),
-                showlegend=False, height=450
-            )
-            st.plotly_chart(fig, use_container_width=True)
 
             # 상세 지표 메트릭
             m1, m2, m3 = st.columns(3)

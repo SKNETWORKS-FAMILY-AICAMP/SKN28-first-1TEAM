@@ -1,7 +1,7 @@
 import streamlit as st
 import plotly.express as px
 px.defaults.color_discrete_sequence = px.colors.qualitative.Alphabet
-
+import numpy as np
 
 def render(dp):
     st.title("교통 혼잡도 / 사고 위험지수 분석")
@@ -13,21 +13,36 @@ def render(dp):
     아래 차트에서 **원의 크기가 클수록** 해당 구의 위험 지수가 높음을 의미합니다.
     """)
 
+        # 1. 데이터 가져오기
     df = dp.get_danger_index()
-    
-    # 위험 지수 계산
-    df['danger_score'] = (df['total_accidents'] / df['total_traffics']) * 100000
-    
+
+    # 2. 사고 절대량 점수 계산 (0~50점 만점 스케일링)
+    acc_min = df['total_accidents'].min()
+    acc_max = df['total_accidents'].max()
+    # 모든 구의 사고 건수를 0~50점 사이로 변환
+    df['abs_part'] = (df['total_accidents'] - acc_min) / (acc_max - acc_min) * 50
+
+    # 3. 교통량 점수 계산 (0~50점 만점 스케일링)
+    tra_min = df['total_traffics'].min()
+    tra_max = df['total_traffics'].max()
+    # 사고 비율을 0~50점 사이로 변환
+    df['rel_part'] = (df['total_traffics'] - tra_min) / (tra_max - tra_min) * 50
+
+    # 4. 최종 위험 지수 합산 (0~100점 만점)
+    # 기존 변수명인 danger_score를 그대로 사용합니다.
+    df['danger_score'] = df['abs_part'] + df['rel_part']
+
+    # --- 아래부터는 기존에 작성하신 코드와 동일하게 작동합니다 ---
+
     # 2. 주요 지표 요약 (Metric Card)
     max_danger_gu = df.loc[df['danger_score'].idxmax()]
-    
+
     col_a, col_b = st.columns(2)
     with col_a:
         st.metric("가장 위험 지수가 높은 구", f"{max_danger_gu['gu']}")
     with col_b:
+        # 이제 지수가 100점 만점 기준이므로 훨씬 직관적입니다.
         st.metric("최고 위험 지수", f"{max_danger_gu['danger_score']:.2f}", delta="주의 필요", delta_color="inverse")
-
-    st.divider()
 
     # 3. 상단 차트: 버블 차트 (상관관계 분석)
     st.subheader("교통량과 사고 발생의 상관관계")
