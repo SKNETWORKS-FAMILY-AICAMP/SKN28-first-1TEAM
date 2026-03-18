@@ -30,13 +30,21 @@
 
 - ---
 
-## 🛠 기술 스택 (Tech Stack)
+## 기술 스택 (Tech Stack)
 - **Language:** `Python 3.10+`
 - **Database:** `MySQL`
 - **Web Framework:** `Streamlit`
 - **Visualization:** `Plotly`, `Pandas`, `Matplotlib`
 
----
+## 사용한 데이터
+시간 별 교통량 테이터 
+https://viewt.ktdb.go.kr/cong/map/TableMove_Zeke.do 
+
+시간 별 교통 사고 수, 교통사고 사상자 수 데이터 
+https://taas.koroad.or.kr/sta/acs/exs/typical.do?menuId=WEB_KMP_OVT_UAS_ASA
+
+지역 별 차량 등록 수 데이터
+https://kosis.kr/statHtml/statHtml.do?sso=ok&returnurl=https%3A%2F%2Fkosis.kr%3A443%2FstatHtml%2FstatHtml.do%3FtblId%3DDT_MLTM_5498%26orgId%3D116%26
 
 ## 파일구조
 
