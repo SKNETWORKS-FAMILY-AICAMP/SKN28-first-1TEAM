@@ -47,7 +47,7 @@ def render(dp):
 
     # 오른쪽 컬럼: 평균 혼잡도 그래프
     with col_chart_r:
-        congest_df_sorted = gu_congest_df.sort_values(by='avg_congest', ascending=True)
+        congest_df_sorted = gu_traffic_df.sort_values(by='avg_congest', ascending=True)
         fig_con = px.bar(
             congest_df_sorted, x='gu', y='avg_congest',
             title="자치구별 평균 혼잡도 순위 (낮은 순)",
