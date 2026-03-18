@@ -13,35 +13,52 @@ def render(dp):
     col1.metric("총 등록 인구", f"{int(summary_data['total_pop'][0]):,} 명")
     col2.metric("총 등록 차량", f"{int(summary_data['total_cars'][0]):,} 대")
     col3.metric("총 사고 건수", f"{int(summary_data['total_accidents'][0]):,} 건")
-    # 자치구별 총 교통량의 평균으로 변경
+    # 자치구별 총 교통량의 평균으로 변경    
     col4.metric("총 교통량", f"{avg_total_traffic:,.0f} 대")
 
     st.divider()
 
-    # 2. 자치구별 사고 건수 그래프 (기존 유지)
-    danger_df = dp.get_danger_index().sort_values(by='total_accidents', ascending=True)
-    fig_acc = px.bar(
-        danger_df, x='gu', y='total_accidents',
-        title="자치구별 사고 건수 순위 (적은 순)",
-        color='total_accidents', 
-        color_continuous_scale='Reds',
-        labels={'gu': '자치구', 'total_accidents': '사고 건수(건)'}
-    )
-    fig_acc.update_layout(xaxis_tickangle=-45)
-    st.plotly_chart(fig_acc, use_container_width=True)
+    # 2. 자치구별 사고 건수 그래프 (위)Z
+    st.divider()
 
-    st.write("") 
-
-    # 3. 자치구별 총 교통량 그래프 (수정 부분)
-    # 'total_traffic' 기준으로 정렬
-    traffic_df_sorted = gu_traffic_df.sort_values(by='total_traffic', ascending=True)
+    # --- 섹션 2 & 3: 사고 건수 및 평균 혼잡도 좌우 배치 ---
+    st.subheader("자치구별 주요 교통 지표 비교")
     
-    fig_tra = px.bar(
-        traffic_df_sorted, x='gu', y='total_traffic',
-        title="자치구별 총 교통량 순위 (합계 기준)",
-        color='total_traffic', 
-        color_continuous_scale='Viridis',
-        labels={'gu': '자치구', 'total_traffic': '총 교통량(대)'}
-    )
-    fig_tra.update_layout(xaxis_tickangle=-45)
-    st.plotly_chart(fig_tra, use_container_width=True)
+    # 1:1 비율로 컬럼 나누기
+    col_chart_l, col_chart_r = st.columns(2)
+
+    # 왼쪽 컬럼: 사고 건수 그래프
+    with col_chart_l:
+        danger_df = dp.get_danger_index().sort_values(by='total_accidents', ascending=True)
+        fig_acc = px.bar(
+            danger_df, x='gu', y='total_accidents',
+            title="자치구별 사고 건수 순위 (적은 순)",
+            color='total_accidents', 
+            color_continuous_scale='Reds',
+            labels={'gu': '자치구', 'total_accidents': '사고 건수(건)'},
+            height=450 # 좌우 배치 시 높이를 살짝 줄이는 게 보기 좋습니다 (기존 600)
+        )
+        # x축 레이블 각도와 폰트 크기 조정으로 가독성 확보
+        fig_acc.update_layout(
+            xaxis=dict(tickangle=-45, tickfont=dict(size=10)),
+            margin=dict(l=10, r=10, t=30, b=30) # 여백 조정
+        )
+        st.plotly_chart(fig_acc, use_container_width=True)
+
+    # 오른쪽 컬럼: 평균 혼잡도 그래프
+    with col_chart_r:
+        congest_df_sorted = gu_congest_df.sort_values(by='avg_congest', ascending=True)
+        fig_con = px.bar(
+            congest_df_sorted, x='gu', y='avg_congest',
+            title="자치구별 평균 혼잡도 순위 (낮은 순)",
+            color='avg_congest', 
+            color_continuous_scale='Blues',
+            labels={'gu': '자치구', 'avg_congest': '평균 혼잡도'},
+            height=450
+        )
+        # x축 레이블 각도와 폰트 크기 조정으로 가독성 확보
+        fig_con.update_layout(
+            xaxis=dict(tickangle=-45, tickfont=dict(size=10)),
+            margin=dict(l=10, r=10, t=30, b=30) # 여백 조정
+        )
+        st.plotly_chart(fig_con, use_container_width=True)
