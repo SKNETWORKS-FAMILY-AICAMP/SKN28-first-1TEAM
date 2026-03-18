@@ -6,7 +6,7 @@ def render(dp):
     
     # 데이터 로드 (수정된 메서드 호출)
     summary_data = dp.get_main_summary()
-    avg_total_traffic, gu_traffic_df = dp.get_total_traffic_metrics()
+    avg_total_traffic, gu_traffic_df = dp.get_congestion_metrics()
     
     # 1. 상단 지표 (Metric)
     col1, col2, col3, col4 = st.columns(4)
@@ -15,8 +15,6 @@ def render(dp):
     col3.metric("총 사고 건수", f"{int(summary_data['total_accidents'][0]):,} 건")
     # 자치구별 총 교통량의 평균으로 변경    
     col4.metric("총 교통량", f"{avg_total_traffic:,.0f} 대")
-
-    st.divider()
 
     # 2. 자치구별 사고 건수 그래프 (위)Z
     st.divider()

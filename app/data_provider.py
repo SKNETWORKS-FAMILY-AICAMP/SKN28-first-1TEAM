@@ -167,3 +167,22 @@ class DataProvider:
         JOIN locals l ON t.local_code_traffic = l.local_codes
         """
         return self.get_query_data(query)
+    
+    def get_total_traffic_metrics(self):
+        """자치구별 전체 시간대 교통량 합계 및 그 합계들의 평균 추출"""
+        # 1. 자치구별 총 교통량 (Bar Chart용: 모든 시간대 합산)
+        gu_query = """
+        SELECT l.local_name as gu, SUM(t.volume) as total_traffic
+        FROM car_traffic_by_time t
+        JOIN locals l ON t.local_code_traffic = l.local_codes
+        GROUP BY l.local_name
+        """
+        gu_df = self.get_query_data(gu_query)
+        
+        # 2. 자치구별 총 교통량들의 평균 (Metric 표시용)
+        if not gu_df.empty:
+            avg_total_traffic = gu_df['total_traffic'].mean()
+        else:
+            avg_total_traffic = 0
+            
+        return avg_total_traffic, gu_df
