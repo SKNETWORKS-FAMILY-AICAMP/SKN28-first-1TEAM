@@ -22,7 +22,8 @@ class DataProvider:
             (SELECT SUM(population_count) FROM populations) as total_pop,
             (SELECT SUM(car_count) FROM car_reg) as total_cars,
             (SELECT SUM(volume) FROM car_accident_by_time) as total_accidents,
-            (SELECT SUM(volume) FROM car_casualties_by_time) as total_casualties
+            (SELECT SUM(volume) FROM car_casualties_by_time) as total_casualties,
+            (SELECT SUM(volume) FROM car_traffic_by_time) as total_traffics
         """
         return self.get_query_data(query)
 
@@ -59,11 +60,13 @@ class DataProvider:
     def get_danger_index(self):
         query = """
         SELECT l.local_name as gu, p.population_count, c.car_count, 
-               SUM(a.volume) as total_accidents
+               SUM(a.volume) as total_accidents,
+               SUM(t.volume) as total_traffics
         FROM locals l
         JOIN populations p ON l.local_codes = p.local_code_pop
         JOIN car_reg c ON l.local_codes = c.local_code_reg
         JOIN car_accident_by_time a ON l.local_codes = a.local_code_accident
+        JOIN car_traffic_by_time t ON l.local_codes = t.local_code_traffic
         GROUP BY l.local_name, p.population_count, c.car_count
         """
         return self.get_query_data(query)
@@ -152,3 +155,4 @@ class DataProvider:
         JOIN locals l ON t.local_code_traffic = l.local_codes
         """
         return self.get_query_data(query)
+    
