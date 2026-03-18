@@ -2,7 +2,7 @@ import streamlit as st
 import plotly.express as px
 
 def render(dp):
-    st.title("📊 2023 서울시 교통 데이터 개요")
+    st.title("2023 서울시 교통 데이터 개요")
     
     # 데이터 로드
     summary_data = dp.get_main_summary()

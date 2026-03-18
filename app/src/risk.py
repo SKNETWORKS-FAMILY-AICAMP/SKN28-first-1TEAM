@@ -2,7 +2,7 @@ import streamlit as st
 import plotly.express as px
 
 def render(dp):
-    st.title("인구&차량 대비 교통 혼잡도 / 사고 위험도 분석")
+    st.title("인구&차량 대비 교통 혼잡도 / 사고 위험지수 분석")
     st.divider()
     st.subheader("사고 위험지수")
     # 1. 정의 및 분석 가이드

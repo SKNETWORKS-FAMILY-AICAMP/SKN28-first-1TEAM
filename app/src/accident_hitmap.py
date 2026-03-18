@@ -5,10 +5,9 @@ import json
 
 def render(dp):
     st.title("🚗 서울시 교통 지표 통합 분석 히트맵")
-    st.info("사고 수, 교통량 및 등록 차량 대비 포화도를 실시간으로 분석합니다.")
 
     # 2. GeoJSON 불러오기 (서울 구 경계 - 로컬 파일 권장)
-    with open("app/seoul_geo_gu.json", encoding='utf-8') as f:
+    with open("seoul_geo_gu.json", encoding='utf-8') as f:
         seoul_geo = json.load(f)
 
     # 자치구 중심점 좌표 (텍스트 표시용)
