@@ -19,7 +19,7 @@ def render(dp):
 
     df.columns = df.columns.str.strip()
 
-    st.write("📄 데이터 미리보기", df.head())
+    st.write("데이터 미리보기", df.head())
 
 # -----------------------------
 # 3. 시간대 선택
@@ -30,7 +30,7 @@ def render(dp):
     "18시~20시_비율","20시~22시_비율","22시~24시_비율"
 ]
 
-    target_col = st.selectbox("🕒 시간대 선택", time_cols)
+    target_col = st.selectbox("시간대 선택", time_cols)
 
     df_clean = df.dropna(subset=[target_col])
 # -----------------------------
@@ -85,7 +85,7 @@ def render(dp):
 # -----------------------------
 # 8. 결과 출력 (표 형태)
 # -----------------------------
-    st.subheader("📈 상위 3개 지역")
+    st.subheader("상위 3개 지역")
 
     st.table(
         top3[["순위", "구", target_col]].rename(columns={
@@ -94,7 +94,7 @@ def render(dp):
         })
     )
 
-    st.subheader("📉 하위 3개 지역")
+    st.subheader("하위 3개 지역")
 
     st.table(
         bottom3[["순위", "구", target_col]].rename(columns={

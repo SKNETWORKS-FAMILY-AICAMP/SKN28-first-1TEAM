@@ -89,7 +89,7 @@ def render(dp):
 
     st.divider()
     # 마지막 강조 문구
-    st.warning(f"💡 분석 결과 서울시 교통 안전 최우선 관리 자치구는 **{max_danger_gu['gu']}**입니다.")
+    st.warning(f"분석 결과 서울시 교통 안전 최우선 관리 자치구는 **{max_danger_gu['gu']}**입니다.")
 
     st.divider()
     
