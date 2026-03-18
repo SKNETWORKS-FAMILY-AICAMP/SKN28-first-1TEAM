@@ -59,18 +59,30 @@ class DataProvider:
 
     def get_danger_index(self):
         query = """
-        SELECT l.local_name as gu, p.population_count, c.car_count, 
-               SUM(a.volume) as total_accidents,
-               SUM(t.volume) as total_traffics
+        SELECT 
+            l.local_name as gu, 
+            p.population_count, 
+            c.car_count, 
+            acc.total_accidents,
+            tra.total_traffics
         FROM locals l
         JOIN populations p ON l.local_codes = p.local_code_pop
         JOIN car_reg c ON l.local_codes = c.local_code_reg
-        JOIN car_accident_by_time a ON l.local_codes = a.local_code_accident
-        JOIN car_traffic_by_time t ON l.local_codes = t.local_code_traffic
-        GROUP BY l.local_name, p.population_count, c.car_count
+        -- 사고 합계를 먼저 구함
+        JOIN (
+            SELECT local_code_accident, SUM(volume) as total_accidents 
+            FROM car_accident_by_time 
+            GROUP BY local_code_accident
+        ) acc ON l.local_codes = acc.local_code_accident
+        -- 교통량 합계를 먼저 구함
+        JOIN (
+            SELECT local_code_traffic, SUM(volume) as total_traffics 
+            FROM car_traffic_by_time 
+            GROUP BY local_code_traffic
+        ) tra ON l.local_codes = tra.local_code_traffic
         """
         return self.get_query_data(query)
-    
+        
 
     def get_integrated_indices(self):
         query = """
