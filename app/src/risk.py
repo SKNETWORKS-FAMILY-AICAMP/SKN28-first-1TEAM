@@ -4,19 +4,19 @@ px.defaults.color_discrete_sequence = px.colors.qualitative.Alphabet
 
 
 def render(dp):
-    st.title("인구&차량 대비 교통 혼잡도 / 사고 위험지수 분석")
+    st.title("교통 혼잡도 / 사고 위험지수 분석")
     st.divider()
     st.subheader("사고 위험지수")
     # 1. 정의 및 분석 가이드
     st.info("""
-    💡 **위험 지수란?** 인구 1만 명당 발생하는 사고 건수를 의미하며, 수치가 높을수록 인구 밀집 대비 교통 안전이 취약함을 나타냅니다.  
+    💡 **위험 지수란?** 교통량 대비 발생하는 사고 건수를 의미하며, 수치가 높을수록 교통 안전이 취약함을 나타냅니다.  
     아래 차트에서 **원의 크기가 클수록** 해당 구의 위험 지수가 높음을 의미합니다.
     """)
 
     df = dp.get_danger_index()
     
     # 위험 지수 계산
-    df['danger_score'] = (df['total_accidents'] / df['population_count']) * 10000
+    df['danger_score'] = (df['total_accidents'] / df['total_traffics']) * 100000
     
     # 2. 주요 지표 요약 (Metric Card)
     max_danger_gu = df.loc[df['danger_score'].idxmax()]
@@ -30,14 +30,14 @@ def render(dp):
     st.divider()
 
     # 3. 상단 차트: 버블 차트 (상관관계 분석)
-    st.subheader("차량 등록수와 사고 발생의 상관관계")
+    st.subheader("교통량과 사고 발생의 상관관계")
     fig1 = px.scatter(
-        df, x="car_count", y="total_accidents", 
+        df, x="total_traffics", y="total_accidents", 
         size="danger_score", color="gu",
         hover_name="gu",
         size_max=50, 
         template="plotly_white",
-        labels={'car_count': '등록 차량 수', 'total_accidents': '총 사고 건수'},
+        labels={'total_traffics': '총 교통량', 'total_accidents': '총 사고 건수'},
         title="원의 크기: 인구 대비 위험도"
     )
     fig1.update_layout(height=600)

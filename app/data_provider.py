@@ -22,7 +22,8 @@ class DataProvider:
             (SELECT SUM(population_count) FROM populations) as total_pop,
             (SELECT SUM(car_count) FROM car_reg) as total_cars,
             (SELECT SUM(volume) FROM car_accident_by_time) as total_accidents,
-            (SELECT SUM(volume) FROM car_casualties_by_time) as total_casualties
+            (SELECT SUM(volume) FROM car_casualties_by_time) as total_casualties,
+            (SELECT SUM(volume) FROM car_traffic_by_time) as total_traffics
         """
         return self.get_query_data(query)
 
@@ -59,11 +60,13 @@ class DataProvider:
     def get_danger_index(self):
         query = """
         SELECT l.local_name as gu, p.population_count, c.car_count, 
-               SUM(a.volume) as total_accidents
+               SUM(a.volume) as total_accidents,
+               SUM(t.volume) as total_traffics
         FROM locals l
         JOIN populations p ON l.local_codes = p.local_code_pop
         JOIN car_reg c ON l.local_codes = c.local_code_reg
         JOIN car_accident_by_time a ON l.local_codes = a.local_code_accident
+        JOIN car_traffic_by_time t ON l.local_codes = t.local_code_traffic
         GROUP BY l.local_name, p.population_count, c.car_count
         """
         return self.get_query_data(query)
@@ -86,24 +89,24 @@ class DataProvider:
         """
         return self.get_query_data(query)
     
-    def get_congestion_metrics(self):
-        """전체 평균 혼잡도 및 자치구별 평균 혼잡도 데이터 추출"""
-        # 1. 전체 평균 혼잡도 (Metric 표시용)
-        # car_traffic_by_time 테이블의 volume 컬럼 평균 계산
-        avg_query = "SELECT AVG(volume) as avg_congest FROM car_traffic_by_time"
-        avg_res = self.get_query_data(avg_query)
-        total_avg = float(avg_res['avg_congest'][0]) if avg_res['avg_congest'][0] is not None else 0
-        
-        # 2. 자치구별 평균 혼잡도 (Bar Chart 표시용)
-        # locals 테이블과 조인하여 자치구 이름별 평균 volume 계산
+    def get_total_traffic_metrics(self):
+        """자치구별 전체 시간대 교통량 합계 및 그 합계들의 평균 추출"""
+        # 1. 자치구별 총 교통량 (Bar Chart용: 모든 시간대 합산)
         gu_query = """
-        SELECT l.local_name as gu, AVG(t.volume) as avg_congest
+        SELECT l.local_name as gu, SUM(t.volume) as total_traffic
         FROM car_traffic_by_time t
         JOIN locals l ON t.local_code_traffic = l.local_codes
         GROUP BY l.local_name
         """
         gu_df = self.get_query_data(gu_query)
-        return total_avg, gu_df
+        
+        # 2. 자치구별 총 교통량들의 평균 (Metric 표시용)
+        if not gu_df.empty:
+            avg_total_traffic = gu_df['total_traffic'].mean()
+        else:
+            avg_total_traffic = 0
+            
+        return avg_total_traffic, gu_df
     
     def get_driving_score(self, gu_name, time_slot):
         """특정 구와 시간대의 데이터를 분석하여 운전 점수 산출"""
@@ -152,3 +155,4 @@ class DataProvider:
         JOIN locals l ON t.local_code_traffic = l.local_codes
         """
         return self.get_query_data(query)
+    

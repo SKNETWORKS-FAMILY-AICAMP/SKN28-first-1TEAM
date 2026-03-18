@@ -4,20 +4,21 @@ import plotly.express as px
 def render(dp):
     st.title("2023 서울시 교통 데이터 개요")
     
-    # 데이터 로드
+    # 데이터 로드 (수정된 메서드 호출)
     summary_data = dp.get_main_summary()
-    total_avg_congest, gu_congest_df = dp.get_congestion_metrics()
+    avg_total_traffic, gu_traffic_df = dp.get_total_traffic_metrics()
     
-    # 1. 상단 지표 (Metric) - 4칸 구성
+    # 1. 상단 지표 (Metric)
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("총 등록 인구", f"{int(summary_data['total_pop'][0]):,} 명")
     col2.metric("총 등록 차량", f"{int(summary_data['total_cars'][0]):,} 대")
     col3.metric("총 사고 건수", f"{int(summary_data['total_accidents'][0]):,} 건")
-    col4.metric("평균 혼잡도", f"{total_avg_congest:,.0f} 대")
+    # 자치구별 총 교통량의 평균으로 변경    
+    col4.metric("총 교통량", f"{avg_total_traffic:,.0f} 대")
 
     st.divider()
 
-    # 2. 자치구별 사고 건수 그래프 (위)
+    # 2. 자치구별 사고 건수 그래프 (위)Z
     st.divider()
 
     # --- 섹션 2 & 3: 사고 건수 및 평균 혼잡도 좌우 배치 ---
