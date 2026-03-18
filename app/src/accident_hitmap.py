@@ -7,7 +7,7 @@ def render(dp):
     st.title("🚗 서울시 교통 지표 통합 분석 히트맵")
 
     # 2. GeoJSON 불러오기 (서울 구 경계 - 로컬 파일 권장)
-    with open("seoul_geo_gu.json", encoding='utf-8') as f:
+    with open("app\seoul_geo_gu.json", encoding='utf-8') as f:
         seoul_geo = json.load(f)
 
     # 자치구 중심점 좌표 (텍스트 표시용)
