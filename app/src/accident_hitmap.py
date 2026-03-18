@@ -64,15 +64,13 @@ def render(dp):
         color_continuous_scale=scale,
         range_color=[min_range, max_range],
         mapbox_style="carto-positron",
-        zoom=10.2,
+        zoom=9.8,
         center={"lat": 37.5665, "lon": 126.9780},
         opacity=0.7,
         labels={'gu': '자치구', col: label},
-        height=800  # 요청하신 세로 크기
+        height=500  
     )
 
-    # 툴팁 형식 설정 ( : 사용 및 숫자 포맷팅)
-    # 포화도는 소수점 2자리(%.2f), 나머지는 천단위 콤마 적용
     val_format = ":.2f" if view_option == "교통 포화도" else ":,"
     fig.update_traces(
         hovertemplate=f"<b>자치구 : %{{location}}</b><br>{label} : %{{z{val_format}}}<extra></extra>"

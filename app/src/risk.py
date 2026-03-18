@@ -1,5 +1,7 @@
 import streamlit as st
 import plotly.express as px
+px.defaults.color_discrete_sequence = px.colors.qualitative.Alphabet
+
 
 def render(dp):
     st.title("인구&차량 대비 교통 혼잡도 / 사고 위험지수 분석")
@@ -28,7 +30,7 @@ def render(dp):
     st.divider()
 
     # 3. 상단 차트: 버블 차트 (상관관계 분석)
-    st.subheader("🚗 차량 등록수와 사고 발생의 상관관계")
+    st.subheader("차량 등록수와 사고 발생의 상관관계")
     fig1 = px.scatter(
         df, x="car_count", y="total_accidents", 
         size="danger_score", color="gu",
@@ -44,7 +46,7 @@ def render(dp):
     st.divider()
 
     # 4. 하단 상세 분석: 위험 지수 TOP 5 강조 (주영님이 요청하신 부분)
-    st.subheader("🏆 자치구별 위험 지수 상세 분석")
+    st.subheader("자치구별 위험 지수 상세 분석")
     
     # 데이터 정렬 (위험 지수 높은 순)
     df_sorted = df.sort_values(by='danger_score', ascending=False).reset_index(drop=True)
@@ -52,7 +54,7 @@ def render(dp):
     col1, col2 = st.columns([1, 1.5])
     
     with col1:
-        st.error("🚨 **위험 지수 상위 TOP 5**")
+        st.error("**위험 지수 상위 TOP 5**")
         # 1위부터 5위까지 루프를 돌며 깔끔하게 표시
         for i in range(5):
             gu_name = df_sorted.iloc[i]['gu']
@@ -60,7 +62,7 @@ def render(dp):
             st.write(f"**{i+1}위 : {gu_name}** ({score:.2f})")
 
     with col2:
-        st.success("📝 **분석요약**")
+        st.success("**분석요약**")
         # 분석 인사이트 텍스트
         st.write(f"""
         현재 데이터 분석 결과, **{max_danger_gu['gu']}** 지역이 인구 대비 사고 발생률이 가장 높게 나타났습니다. 
@@ -83,36 +85,55 @@ def render(dp):
         st.error(f"데이터베이스에서 지표를 계산하는 중 오류가 발생했습니다: {e}")
         return
     
-    # --- 섹션 1: 안전 지수 ---
-    st.subheader("🛡️ 자치구별 안전 지수 (낮을수록 안전)")
-    # 안전 지수 식: ((사고*0.4 + 사상자*0.6) / 차량수) * 10
-    df_safety = df.sort_values('safety_index', ascending=False)
-    
-    fig_safety = px.bar(
-        df_safety, x='gu', y='safety_index',
-        color='safety_index', 
-        color_continuous_scale='Blues', # 낮을수록 연한 파란색
-        labels={'gu': '자치구', 'safety_index': '안전 지수'}
-    )
-    fig_safety.update_layout(xaxis_tickangle=-45)
-    st.plotly_chart(fig_safety, use_container_width=True)
-    st.caption("※ 안전 지수가 낮을수록 해당 자치구의 등록 차량 대비 사고 위험도가 낮음을 의미합니다.")
+    chart_col1, chart_col2 = st.columns(2)
 
-    st.divider()
+    # 왼쪽 컬럼: 안전 지수
+    with chart_col1:
+        st.markdown("#### 자치구별 안전 지수 (낮을수록 안전)")
+        df_safety = df.sort_values('safety_index', ascending=False)
+        
+        fig_safety = px.bar(
+            df_safety, x='gu', y='safety_index',
+            color='safety_index', 
+            color_continuous_scale='Blues',
+            labels={'gu': '자치구', 'safety_index': '안전 지수'},
+            height=450  # 좌우 배치 시 높이를 살짝 줄이는 게 보기 좋습니다
+        )
+        fig_safety.update_layout(
+        xaxis=dict(
+        tickmode='linear',
+        tickangle=0,            
+        tickfont=dict(size=10)  
+    ),
+    margin=dict(l=10, r=10, t=40, b=50),
+    height=450
+)
+        fig_safety.update_layout(xaxis_tickangle=-45, margin=dict(l=0, r=0, t=30, b=0))
+        st.plotly_chart(fig_safety, use_container_width=True)
+        st.caption("※ 낮을수록 등록 차량 대비 사고 위험도가 낮음")
 
-    # --- 섹션 2: 혼잡 지수 ---
-    st.subheader("🚦 자치구별 혼잡 지수 (낮을수록 쾌적)")
-    # 혼잡 지수 식: (혼잡빈도 + 혼잡시간) / 2
-    df_congest = df.sort_values('congestion_index', ascending=False)
-    
-    fig_congest = px.bar(
-        df_congest, x='gu', y='congestion_index',
-        color='congestion_index', 
-        color_continuous_scale='YlOrRd', # 낮을수록 노란색, 높을수록 빨간색
-        labels={'gu': '자치구', 'congestion_index': '혼잡 지수'}
-    )
-    fig_congest.update_layout(xaxis_tickangle=-45)
-    st.plotly_chart(fig_congest, use_container_width=True)
-    st.caption("※ 혼잡 지수는 도로의 정체 빈도와 지속 시간을 결합한 수치입니다.")
+    # 오른쪽 컬럼: 혼잡 지수
+    with chart_col2:
+        st.markdown("#### 자치구별 혼잡 지수 (낮을수록 쾌적)")
+        df_congest = df.sort_values('congestion_index', ascending=False)
+        
+        fig_congest = px.bar(
+            df_congest, x='gu', y='congestion_index',
+            color='congestion_index', 
+            color_continuous_scale='YlOrRd',
+            labels={'gu': '자치구', 'congestion_index': '혼잡 지수'},
+            height=450
+        )
+        fig_congest.update_layout(
+            xaxis=dict(
+                tickmode='linear',
+                tickangle=-45,            
+                tickfont=dict(size=10)  
+            ),
+            margin=dict(l=10, r=10, t=30, b=50),
+            height=450
+        )
+        st.plotly_chart(fig_congest, use_container_width=True)
+        st.caption("※ 도로의 정체 빈도와 지속 시간을 결합한 수치")
 
     st.divider()
